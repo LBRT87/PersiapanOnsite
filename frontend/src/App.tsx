@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Login from "./pages/Login";
 import type { User } from "./dto/User";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function App() {
   const [page, setPage] = useState<'login' | 'register' | 'otp' | 'dashboard'>('login');
@@ -22,7 +23,7 @@ export default function App() {
   // }
 
   return (
-  
+    // <GoogleOAuthProvider clientId="">
       <div className={`min-h-screen bg-slate-900 text-white p-4 flex ${
         page === 'dashboard' ? 'flex-col items-stretch' : 'items-center justify-center'
       }`}>
@@ -31,5 +32,6 @@ export default function App() {
         { page === 'otp' && (<VerifyOtp email={email} onSuccess={ () => setPage('login') }/>) }
         { page === 'dashboard' && user && (<Dashboard user={user} onLogout={handleLogout}/>)} */}
       </div>
+    // </GoogleOAuthProvider>
   );
 }

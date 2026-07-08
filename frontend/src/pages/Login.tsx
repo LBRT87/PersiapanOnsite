@@ -32,23 +32,23 @@ export default function Login({ onLoginSuccess }: LoginProps){
         }
     }
 
-    const loginGoogle = useGoogleLogin({
-        onSuccess: async () => {
-            onerror('');
-            try{
-                const data = await req<LoginResponse>('/auth/google/login', { token:'access_token '});
+    // const loginGoogle = useGoogleLogin({
+    //     onSuccess: async () => {
+    //         onerror('');
+    //         try{
+    //             const data = await req<LoginResponse>('/auth/google/login', { token:'access_token '});
                     
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('refresh_token', data.refresh_token);
-                localStorage.setItem('user_role', data.user.role);
+    //             localStorage.setItem('access_token', data.access_token);
+    //             localStorage.setItem('refresh_token', data.refresh_token);
+    //             localStorage.setItem('user_role', data.user.role);
 
-                onLoginSuccess(data.user);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "error");
-            }
-        },
-        onError: () => setError('Google login failed')
-    })
+    //             onLoginSuccess(data.user);
+    //         } catch (err) {
+    //             setError(err instanceof Error ? err.message : "error");
+    //         }
+    //     },
+    //     onError: () => setError('Google login failed')
+    // })
     
     return (
         <div className="max-w-sm mx-auto bg-slate-800 p-6 rounded-xl border border-slate-700">
