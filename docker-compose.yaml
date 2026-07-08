@@ -44,6 +44,7 @@ services:
       POSTGRESQL_REPLICATION_MODE: master
     volumes:
       - postgres_master_data:/bitnami/postgresql
+      - ./init-db:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRESQL_USERNAME}"]
       interval: 30s
