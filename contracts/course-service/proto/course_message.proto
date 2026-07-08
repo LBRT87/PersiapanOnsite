@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option go_package = "github.com/LBRT87/PersiapanOnsite/contracts/course-service/gen";
+
+package course;
+
+message CourseRequest {
+  string course_id = 1;
+}
+
+message CourseResponse{
+    string course_id = 1;
+    string lecturer_id = 2;
+    string title = 3;
+    string description = 4;
+    uint64 price = 5;
+    uint64 buyer_count = 6;
+}
+
+message EnrollmentRequest {
+  string user_id = 1;
+  string course_id = 2;
+}
+
+message EnrollmentResponse {
+  bool is_paid  = 1;
+}

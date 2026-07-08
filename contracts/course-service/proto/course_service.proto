@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/LBRT87/PersiapanOnsite/contracts/course-service/gen";
+
+package course;
+
+import "course_message.proto";
+
+service CourseService {
+  rpc GetCourse(CourseRequest) returns (CourseResponse);
+}
+
+service EnrollmentService {
+    rpc IsCoursePaid(EnrollmentRequest) returns (EnrollmentResponse);
+}
