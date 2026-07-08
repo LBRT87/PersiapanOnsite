@@ -1,19 +1,33 @@
 import { useState } from "react";
+import type { RegisterResponse } from "../dto/User";
+import { req } from "../api/Api";
+
 
 interface RegisterProps{
     onOtpSent: (email: string) => void
-    onNavigate: (page: 'register' | 'login' | 'dto') => void;
+    onNavigate: (page: 'register' | 'login' | 'otp') => void;
 }
 
 export default function Register({ onOtpSent, onNavigate }: RegisterProps){
-    const [error, setError] = useState('');
+    const [, setError] = useState('');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         const formData = new FormData(e.currentTarget);
         const fields = {
-            email: 
+            username: formData.get('username') as string,
+            date: formData.get('dob') as string,
+            email: formData.get('email') as string,
+            password: formData.get('password') as string,
+            role: 'student'
+        }
+        try {
+            await req<RegisterResponse>('/auth/register', fields);
+            onOtpSent(fields.email as string);
+            onNavigate('otp');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "error"); 
         }
     }
 
@@ -37,7 +51,11 @@ export default function Register({ onOtpSent, onNavigate }: RegisterProps){
                 </div>
 
                 <button className="py-2 bg-emerald-600 text-white font-medium rounded">
-                Register
+                    Register
+                </button>
+
+                <button onClick={() => onNavigate('login')} className="py-2 bg-emerald-600 text-white font-medium rounded">
+                    Have an account? login here
                 </button>
             </form>
         </div>
