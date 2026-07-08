@@ -25,7 +25,7 @@ message GetUserRequest {
 }
 
 message GetUserResponse {
-    uint6464 id = 1;
+    uint64 id = 1;
     string username=2;
     string email=3;
     string role=4;
