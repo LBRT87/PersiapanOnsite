@@ -72,9 +72,27 @@ services:
     image: mrgreen007/pgpool:latest
     ports:
       - "5432:5432"
-
-
+    environtment:
+      PGPOOL_BACKEND_NODES: 0:pg-master:5432,1:pg-slave:5432
+      PGPOOL_SR_CHECK_USER: ${POSTGRESQL_REPL_USERNAME}
+      PGPOOL_SR_CHECK_PASSWORD: ${POSTGRESQL_REPL_PASSWORD}
+      PGPOOL_POSTGRES_USERNAME: ${POSTGRESQL_USERNAME}
+      PGPOOL_POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+      PGPOOL_ENABLE_LDAP: no
+      PGPOOL_ADMIN_USERNAME: ${PGPOOL_ADMIN_USER}
+      PGPOOL_ADMIN_PASSWORD: ${PGPOOL_ADMIN_PASSWORD}
+    depends_on:
+      pg-master:
+        condition: service_healthy
+      pg-slave:
+        condition: service_started
+    networks:
+      - esdemy-network
 
 networks:
   esdemy-network:
     driver: bridge
+    
+volumes:
+  postgres_master_data:
+  postgres_slave_data:
