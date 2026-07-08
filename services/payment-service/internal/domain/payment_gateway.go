@@ -1,11 +1,11 @@
 package domain
 
-type MidtransGateway struct{
-	PaymentUrl string
-	GatewayOrderId string
+type CustomerInfo struct{
+	Name string
+	Email string
 }
 
 type MidtransGatewayRepository interface{
-	CreateTransaction(orderId string, amount float64) (string, string, error)
+	CreateTransaction(orderId string, amount float64, customer CustomerInfo) (string, string, error)
 	GetPaymentStatus(gatewayOrderId string) (string, error)
 }
