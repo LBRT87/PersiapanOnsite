@@ -1,0 +1,98 @@
+services:
+  auth-service:
+    build:
+      context: ./
+      dockerfile: /services/auth-service/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./services/auth-service/:app
+      - /app/tmp
+      - ./contracts/auth-service:/contracts/auth-service
+    depends_on:
+      pgpool:
+        condition: service-started
+    env_file:
+      - ./services/auth-service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - esdemy-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - esdemy-network
+
+  pg-master:
+    image: bitnami/postgresql:latest
+    environment:
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRESQL_REPL_USER: ${POSTGRESQL_REPL_USERNAME}
+      POSTGRESQL_REPL_PASSWORD: ${POSTGRESQL_REPL_PASSWORD}
+      POSTGRESQL_REPLICATION_MODE: master
+    volumes:
+      - postgres_master_data:/bitnami/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "{POSTGRESQL_USERNAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - esdemy-network
+    
+
+  pg-slave:
+    image: bitnami/postgresql:latest
+    environment:
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRESQL_REPL_USER: ${POSTGRESQL_REPL_USERNAME}
+      POSTGRESQL_REPL_PASSWORD: ${POSTGRESQL_REPL_PASSWORD}
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_MASTER_HOST: pg-master
+    volumes:
+      - postgres_master_data:/bitnami/postgresql
+    depends_on:
+      pg-master:
+        condition: service_healthy
+    networks:
+      - esdemy-network
+
+  pgpool:
+    image: mrgreen007/pgpool:latest
+    ports:
+      - "5432:5432"
+    environtment:
+      PGPOOL_BACKEND_NODES: 0:pg-master:5432,1:pg-slave:5432
+      PGPOOL_SR_CHECK_USER: ${POSTGRESQL_REPL_USERNAME}
+      PGPOOL_SR_CHECK_PASSWORD: ${POSTGRESQL_REPL_PASSWORD}
+      PGPOOL_POSTGRES_USERNAME: ${POSTGRESQL_USERNAME}
+      PGPOOL_POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+      PGPOOL_ENABLE_LDAP: no
+      PGPOOL_ADMIN_USERNAME: ${PGPOOL_ADMIN_USER}
+      PGPOOL_ADMIN_PASSWORD: ${PGPOOL_ADMIN_PASSWORD}
+    depends_on:
+      pg-master:
+        condition: service_healthy
+      pg-slave:
+        condition: service_started
+    networks:
+      - esdemy-network
+
+networks:
+  esdemy-network:
+    driver: bridge
+    
+volumes:
+  postgres_master_data:
+  postgres_slave_data:
