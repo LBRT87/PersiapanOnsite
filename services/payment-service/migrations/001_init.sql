@@ -3,6 +3,8 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE Order IF NOT EXISTS(
     order_id VARCHAR(255) PRIMARY KEY DEFAULT gen_random_uuid(),
     UserId VARCHAR(255) NOT NULL,
+    PaymentUrl varchar(255),
+    GatewayOrderId VARCHAR(255),
     amount NUMERIC(10,2) NOT NULL DEFAULT 0,
     created_at DateTime DEFAULT NOW()
 );
